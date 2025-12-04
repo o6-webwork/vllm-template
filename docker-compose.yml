@@ -1,0 +1,27 @@
+services:
+  vllm_Qwen2.5-Coder-14B-Instruct:
+    container_name: vllm_Qwen2.5-Coder-14B-Instruct
+    image: vllm/vllm-openai:v0.6.6
+    restart: unless-stopped
+    ports:
+      - "1234:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    volumes:
+      - ./models/Qwen2.5-Coder-14B-Instruct:/models/Qwen2.5-Coder-14B-Instruct
+    ipc: host
+    environment:
+      - HF_HUB_OFFLINE=1
+    command: [
+      "--model", "/models/Qwen2.5-Coder-14B-Instruct",
+      "--enforce-eager",
+      "--served-model-name", "Qwen2.5-Coder-14B-Instruct",
+      "--trust-remote-code",
+      "--guided-decoding-backend", "outlines",
+      "--gpu-memory-utilization", "0.8"
+    ]
